@@ -1,5 +1,8 @@
 import os
 import pathlib
 import time
+import argparse
 
-print("hello man!")
+if __name__ == "__main__":
+    print("hello man!")
+
