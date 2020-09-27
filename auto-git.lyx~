@@ -409,5 +409,132 @@ auto-git-settings.json
 auto-git.py
 \end_layout
 
+\begin_layout Enumerate
+בדיקה!
+\end_layout
+
+\begin_layout Section
+חזון לשימוש
+\family roman
+\series bold
+\shape up
+\size larger
+\emph off
+\bar no
+\strikeout off
+\xout off
+\uuline off
+\uwave off
+\noun off
+\color none
+ 
+\family default
+\series default
+\shape default
+\size default
+\emph default
+\numeric on
+\bar default
+\strikeout default
+\xout default
+\uuline default
+\uwave default
+\noun default
+\color inherit
+2
+\end_layout
+
+\begin_layout Standard
+ההפעלה תהיה בשורת הפקודה, כאשר עם דגלים שונים נוכל לבצע פעולות שונות.
+\end_layout
+
+\begin_layout Enumerate
+דגל
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\strikeout off
+\xout off
+\uuline off
+\uwave off
+\noun off
+\color none
+ 
+\family default
+\series default
+\shape default
+\size default
+\emph default
+\bar default
+\strikeout default
+\xout default
+\uuline default
+\uwave default
+\noun default
+\color inherit
+\lang english
+-first-time-config
+\lang hebrew
+- יבצע הגדרה יצירה של מפתח
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\strikeout off
+\xout off
+\uuline off
+\uwave off
+\noun off
+\color none
+ 
+\family default
+\series default
+\shape default
+\size default
+\emph default
+\bar default
+\strikeout default
+\xout default
+\uuline default
+\uwave default
+\noun default
+\color inherit
+\lang english
+ssh
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\strikeout off
+\xout off
+\uuline off
+\uwave off
+\noun off
+\color none
+\lang hebrew
+ 
+\family default
+\series default
+\shape default
+\size default
+\emph default
+\bar default
+\strikeout default
+\xout default
+\uuline default
+\uwave default
+\noun default
+\color inherit
+והשמה שלו בתיקייה בנתיב הבית.
+ כולל גנרוץ סיסמה רנדומלי וכתיבתה בקובץ שניצור ביחד בנתיב הבית
+\end_layout
+
 \end_body
 \end_document
