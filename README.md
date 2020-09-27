@@ -3,3 +3,4 @@ This program binds the `ctrl+s` save action to a git push action, and allow you 
 
 test
 test2
+test3
