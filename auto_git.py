@@ -196,21 +196,22 @@ def main():
     parser = ArgumentParser(description=DESCRIPTION, epilog=EPILOG)
     
     group = parser.add_mutually_exclusive_group(required = True)
-    group.add_argument('-s', '--start-track', action="store_true", help=HELP_START_TRACK)
-    group.add_argument('-n', '--new-track', action="store_true", help=HELP_NEW_TRACK)
+    group.add_argument('-s', '--start-track', action="store", type=str, help=HELP_START_TRACK)
+    group.add_argument('-n', '--new-track', action="store", type=str, help=HELP_NEW_TRACK)
     group.add_argument('-c', '--first-config', action="store_true", help=HELP_FIRST_CONFIG)
 
-    parser.add_argument("file_path", help=HELP_FILE_PATH, metavar=METAVAR_FILE_PATH)
+    # parser.add_argument("file_path", help=HELP_FILE_PATH, metavar=METAVAR_FILE_PATH)
 
     args = parser.parse_args()
 
-    if args.start_track:
-        start_track(args.file_path)
+    if args.start_track is not None:
+        start_track(args.start_track)
     
-    elif args.new_track:
-        new_track(args.file_path)
+    elif args.new_track is not None:
+        new_track(args.new_track)
     
-    elif args.first_config:
+    #todo first config no need for path
+    elif args.first_config is not None:
         first_config()
 
 
