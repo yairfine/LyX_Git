@@ -605,5 +605,108 @@ ssh
 - שיקבל נתיב לקובץ, ויתחיל את המעקב אחרי העדכונים שלו.
 \end_layout
 
+\begin_layout Section
+מבנה התיקייה
+\family roman
+\series bold
+\shape up
+\size larger
+\emph off
+\bar no
+\strikeout off
+\xout off
+\uuline off
+\uwave off
+\noun off
+\color none
+ 
+\family default
+\series default
+\shape default
+\size default
+\emph default
+\bar default
+\strikeout default
+\xout default
+\uuline default
+\uwave default
+\noun default
+\color inherit
+\lang english
+auto-git-settings
+\end_layout
+
+\begin_layout Enumerate
+קובץ הגדרות שיכיל:
+\end_layout
+
+\begin_deeper
+\begin_layout Enumerate
+את הנתיב לקובץ
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\strikeout off
+\xout off
+\uuline off
+\uwave off
+\noun off
+\color none
+ 
+\family default
+\series default
+\shape default
+\size default
+\emph default
+\bar default
+\strikeout default
+\xout default
+\uuline default
+\uwave default
+\noun default
+\color inherit
+\lang english
+ssh
+\end_layout
+
+\begin_layout Enumerate
+קובץ שיכיל
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\strikeout off
+\xout off
+\uuline off
+\uwave off
+\noun off
+\color none
+ 
+\family default
+\series default
+\shape default
+\size default
+\emph default
+\bar default
+\strikeout default
+\xout default
+\uuline default
+\uwave default
+\noun default
+\color inherit
+\lang english
+PAT
+\end_layout
+
+\begin_layout Enumerate
+קובץ על כל הקבצים שלעקוב אחריהם? או שלא...
+\end_layout
+
+\end_deeper
 \end_body
 \end_document
