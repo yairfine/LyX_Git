@@ -533,8 +533,180 @@ ssh
 \noun default
 \color inherit
 והשמה שלו בתיקייה בנתיב הבית.
- כולל גנרוץ סיסמה רנדומלי וכתיבתה בקובץ שניצור ביחד בנתיב הבית
+ כולל גנרוץ סיסמה רנדומלי וכתיבתה בקובץ שניצור ביחד באותה התיקייה.
+ ואז הדרכה להיכנס לחשבון גיטהאב ולשים שם את ה מפתח הפרטי.
 \end_layout
 
+\begin_layout Enumerate
+דגל
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\strikeout off
+\xout off
+\uuline off
+\uwave off
+\noun off
+\color none
+ 
+\family default
+\series default
+\shape default
+\size default
+\emph default
+\bar default
+\strikeout default
+\xout default
+\uuline default
+\uwave default
+\noun default
+\color inherit
+\lang english
+-new-project
+\lang hebrew
+- שבוא נכניס את הנתיב לאיפה שנמצא הקובץ שאותו רוצים לשמור בגיט.
+ ואז הוא יצבע שום גיט איניט, וגיט קומיט כל דקה, ובמסמך ליד, יכתוב אליו לוגים
+ במידה וצריך.
+\end_layout
+
+\begin_layout Enumerate
+דגל
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\strikeout off
+\xout off
+\uuline off
+\uwave off
+\noun off
+\color none
+ 
+\family default
+\series default
+\shape default
+\size default
+\emph default
+\bar default
+\strikeout default
+\xout default
+\uuline default
+\uwave default
+\noun default
+\color inherit
+\lang english
+-start-tracking
+\lang hebrew
+- שיקבל נתיב לקובץ, ויתחיל את המעקב אחרי העדכונים שלו.
+\end_layout
+
+\begin_layout Section
+מבנה התיקייה
+\family roman
+\series bold
+\shape up
+\size larger
+\emph off
+\bar no
+\strikeout off
+\xout off
+\uuline off
+\uwave off
+\noun off
+\color none
+ 
+\family default
+\series default
+\shape default
+\size default
+\emph default
+\bar default
+\strikeout default
+\xout default
+\uuline default
+\uwave default
+\noun default
+\color inherit
+\lang english
+auto-git-settings
+\end_layout
+
+\begin_layout Enumerate
+קובץ הגדרות שיכיל:
+\end_layout
+
+\begin_deeper
+\begin_layout Enumerate
+את הנתיב לקובץ
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\strikeout off
+\xout off
+\uuline off
+\uwave off
+\noun off
+\color none
+ 
+\family default
+\series default
+\shape default
+\size default
+\emph default
+\bar default
+\strikeout default
+\xout default
+\uuline default
+\uwave default
+\noun default
+\color inherit
+\lang english
+ssh
+\end_layout
+
+\begin_layout Enumerate
+את הנתיב לקובץ שמכיל
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\strikeout off
+\xout off
+\uuline off
+\uwave off
+\noun off
+\color none
+ 
+\family default
+\series default
+\shape default
+\size default
+\emph default
+\bar default
+\strikeout default
+\xout default
+\uuline default
+\uwave default
+\noun default
+\color inherit
+\lang english
+PAT
+\end_layout
+
+\begin_layout Enumerate
+קובץ על כל הקבצים שלעקוב אחריהם? או שלא...
+\end_layout
+
+\end_deeper
 \end_body
 \end_document
