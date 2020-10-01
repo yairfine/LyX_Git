@@ -17,9 +17,9 @@ INTERVAL_SECONDS = 7  # 60 in deployment version
 DESCRIPTION = "Track file and automatic push to remote github repository."
 EPILOG = "For more information, visit the project page on: https://github.com/yairfine/auto-git"
 HELP_FILE_PATH = "The path to the file you want to git."
-HELP_START_TRACK = "Sets the program to track an existing repo and file"
-HELP_NEW_TRACK = "Sets the program create a new track for a given file"
-HELP_FIRST_CONFIG = "Sets the program to first-config mode"
+HELP_FIRST_CONFIG = "First time: run this to configure your system"
+HELP_NEW_TRACK = "Initiate a new tracking configuration for a given file"
+HELP_START_TRACK = "Start tracking a given file and it's directory"
 METAVAR_FILE_PATH = "<file_path>"
 
 ERR_PAT_EXISTS = "It's seems like you already configured this system, try to run again with -n/-s flag"
@@ -61,7 +61,10 @@ Make sure you have Git installed (version > 1.5)
 23. COPY!!!: copy the new token (with green V sign aside)
 24. Paste: paste the token here and press enter:
 """
-PROMPT_PAT = "Please enter your Private Accesses Token: "
+PROMPT_PAT = """
+Go to the README file of the project and follow the instructions.
+Please paste your Private Accesses Token here: 
+"""
 PROMPT_REPO_NAME = "Please enter your new repository name: "
 
 SETTINGS_DIR = Path.home() / 'auto-git-settings'
@@ -321,6 +324,8 @@ def main():
     elif args.first_config is not None:
         first_config()
 
+    # todo add a check for global configuration in the beginning of new-track or start-track
+    # todo merge the functions new-track and start-track to one.
 
 if __name__ == "__main__":
     main()
