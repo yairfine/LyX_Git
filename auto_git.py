@@ -6,7 +6,8 @@ import asyncio
 import requests
 from argparse import ArgumentParser
 from pathlib import Path
-from git import Repo # ? https://www.devdungeon.com/content/working-git-repositories-python
+# ? https://www.devdungeon.com/content/working-git-repositories-python
+from git import Repo
 import git
 from pprint import pprint
 import subprocess
@@ -57,71 +58,43 @@ SETTINGS_FILE_GLOBAL = SETTINGS_DIR / 'auto_git_settings_global.txt'
 BASE_URL = 'https://api.github.com'
 
 
-def initiate_settings_dir(settings_dir_path):
+def initiate_settings_global_dir(settings_dir_path):
 
     try:
         settings_dir_path.mkdir()
-
         SETTINGS_FILE_GLOBAL.touch(exist_ok=False)
 
     except FileExistsError:
         print(ERR_PAT_EXISTS)
         sys.exit()
 
+
+def retrieve_pat():
     pat = input(MSG_SSH_PAT_CONFIG)
+    return pat
+
+
+def get_endpoint(end_point, pat):
+    url = f"{BASE_URL}{end_point}"
 
     headers = {
-        "Authorization" : f"token {pat}"
+        "Authorization": f"token {pat}"
     }
-    
-
-    end_point = "/user"
-    url = f"{BASE_URL}{end_point}"
 
     r = requests.get(url, headers=headers)
-    
+
     if not r.ok:
         print("r is not ok - ", r.status_code)
         sys.exit()
+
     try:
-        response_data = json.loads(r.text)
+        response_dict = json.loads(r.text)
     except:
         print("cannot parse json")
         sys.exit()
 
-    user_name = response_data['login']
+    return response_dict
 
-    end_point = "/user/emails"
-    url = f"{BASE_URL}{end_point}"
-
-    r = requests.get(url, headers=headers)
-    
-    if not r.ok:
-        print("r is not ok - ", r.status_code)
-        sys.exit()
-    try:
-        response_data = json.loads(r.text)
-    except:
-        print("cannot parse json")
-        sys.exit()
-        
-    user_email = response_data[0]['email']
-
-    settings_dict_global = {
-        "PAT" : f"{pat}",
-        "user_name" : f"{user_name}",
-        "user_email" : f"{user_email}"
-    }
-    
-    settings_json = json.dumps(settings_dict_global)
-    SETTINGS_FILE_GLOBAL.write_text(settings_json)
-
-    ret = subprocess.run(f"git config --global user.name {user_name}")
-    ret = subprocess.run(f"git config --global user.email {user_email}")
-
-    # * todo create a username and email file!
-    # * todo config them --global !!!
-    # todo add github to the list of known-hosts. handle it before pushes!
 
 async def push_changes(file_to_track):
     dir_path = file_to_track.parent
@@ -135,11 +108,12 @@ async def push_changes(file_to_track):
 
     while True:
         await asyncio.sleep(7)
-        
+
         if repo.is_dirty(untracked_files=True):
-            
+
             repo.git.add('.')
-            repo.index.commit(f"commit no.{settings_dict['count_commits']} - {time.asctime(time.localtime())}")
+            repo.index.commit(
+                f"commit no.{settings_dict['count_commits']} - {time.asctime(time.localtime())}")
             repo.remotes.origin.push()
 
             settings_dict['count_commits'] += 1
@@ -162,11 +136,11 @@ def start_track(raw_file_path):
         # maybe update some settings here?
         loop.close()
 
-
     # * todo create a time based loop, for checking every minuet if a file was changed
     # * todo add, commit, and push changes
     # * todo add count the number of the repos
-    # todo add in json all the files we track 
+    # todo add in json all the files we track
+
 
 def new_track(raw_file_path):
     file_to_track = Path(raw_file_path)
@@ -180,23 +154,22 @@ def new_track(raw_file_path):
         readme_file.touch(exist_ok=False)
         gitignore_file.touch(exist_ok=False)
 
-    except FileExistsError:       
+    except FileExistsError:
         print("It's seems like you already intiated this directory, try to run again with -s flag")
         sys.exit()
 
     repo_name = input("Please enter your new repository name: ")
 
     json_data = {
-    "name" : f"{repo_name}",
-    "private" : "true"
+        "name": f"{repo_name}",
+        "private": "true"
     }
-    
+
     settings_json_global = SETTINGS_FILE_GLOBAL.read_text()
     settings_dict_global = json.loads(settings_json_global.read_text())
 
-
     headers = {
-        "Authorization" : f"token {settings_dict_global['PAT']}"
+        "Authorization": f"token {settings_dict_global['PAT']}"
     }
 
     end_point = "/user/repos"
@@ -204,7 +177,7 @@ def new_track(raw_file_path):
     url = f"{BASE_URL}{end_point}"
 
     r = requests.post(url, headers=headers, json=json_data)
-    
+
     if r.status_code != 201:
         print("an error accord while trying create the repo on github")
         sys.exit()
@@ -214,16 +187,16 @@ def new_track(raw_file_path):
     except:
         print("an error accord while trying create the repo on github")
         sys.exit()
-        
+
     ssh_url = response_data['ssh_url']
     https_url = response_data['clone_url']
 
     settings_dict = {
-        "file_name" : f"{file_to_track.name}",
-        "repo_name" : f"{repo_name}",
-        "ssh_url" : f"{ssh_url}",
-        "https_url" : f"{https_url}",
-        "count_commits" : 1
+        "file_name": f"{file_to_track.name}",
+        "repo_name": f"{repo_name}",
+        "ssh_url": f"{ssh_url}",
+        "https_url": f"{https_url}",
+        "count_commits": 1
     }
     settings_json = json.dumps(settings_dict)
     settings_file.write_text(settings_json)
@@ -246,38 +219,62 @@ def new_track(raw_file_path):
         print(' ~~~ Error creating remote ~~~ ')
         sys.exit()
 
-    new_repo.git.push("--set-upstream", origin, new_repo.head.ref)  
-    
-    
+    new_repo.git.push("--set-upstream", origin, new_repo.head.ref)
 
     # * create a dict to json and retrieve https://stackoverflow.com/questions/26745519/converting-dictionary-to-json
-    # * create settings file with the repo name and repo ssh https URI 
+    # * create settings file with the repo name and repo ssh https URI
     # * todo touch README.md
     # * todo touch .gitignore file
     # * todo git init add commit
     # * todo create new ssh remote tracking branch
     # todo and than start_track()
-    
+
 
 def first_config():
+
+    initiate_settings_global_dir(SETTINGS_DIR)
+
+    pat = retrieve_pat()
+
+    response_dict = get_endpoint("/user", pat)
+
+    user_name = response_dict['login']
+
+    response_dict = get_endpoint("/user/emails", pat)
+
+    user_email = response_dict[0]['email']
+
+    settings_dict_global = {
+        "PAT": f"{pat}",
+        "user_name": f"{user_name}",
+        "user_email": f"{user_email}"
+    }
+    settings_json_global = json.dumps(settings_dict_global)
+    SETTINGS_FILE_GLOBAL.write_text(settings_json_global)
+
+    ret = subprocess.run(f"git config --global user.name {user_name}")
+    ret = subprocess.run(f"git config --global user.email {user_email}")
+
     
-    initiate_settings_dir(SETTINGS_DIR)
+    # todo add github to the list of known-hosts. handle it before pushes!
 
     # todo generate ssh key, store it on place, and copy the pass to ssh.txt
-    
+
     # todo give instructions to copy the pat key to pat.txt
 
-    # todo 
-
+    # todo
 
 
 def main():
     parser = ArgumentParser(description=DESCRIPTION, epilog=EPILOG)
-    
-    group = parser.add_mutually_exclusive_group(required = True)
-    group.add_argument('-f', '--first-config', action="store_true", help=HELP_FIRST_CONFIG)
-    group.add_argument('-n', '--new-track', action="store", type=str, help=HELP_NEW_TRACK, metavar=METAVAR_FILE_PATH)
-    group.add_argument('-s', '--start-track', action="store", type=str, help=HELP_START_TRACK, metavar=METAVAR_FILE_PATH)
+
+    group = parser.add_mutually_exclusive_group(required=True)
+    group.add_argument('-f', '--first-config',
+                       action="store_true", help=HELP_FIRST_CONFIG)
+    group.add_argument('-n', '--new-track', action="store",
+                       type=str, help=HELP_NEW_TRACK, metavar=METAVAR_FILE_PATH)
+    group.add_argument('-s', '--start-track', action="store",
+                       type=str, help=HELP_START_TRACK, metavar=METAVAR_FILE_PATH)
 
     # parser.add_argument("file_path", help=HELP_FILE_PATH, metavar=METAVAR_FILE_PATH)
 
@@ -285,10 +282,10 @@ def main():
 
     if args.start_track is not None:
         start_track(args.start_track)
-    
+
     elif args.new_track is not None:
         new_track(args.new_track)
-    
+
     elif args.first_config is not None:
         first_config()
 
