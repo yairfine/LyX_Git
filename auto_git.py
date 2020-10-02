@@ -32,59 +32,54 @@ MSG_END_NEW_TRACK = "Done preparing for a new track"
 MSG_START_TRACKING = "Started tracking changes on file '{}'"
 MSG_EXIT_TRACKING = "To stop: press Ctrl+C and wait a few seconds"
 MSG_END_TRACKING = "Tracking session has ended"
-MSG_CHANGE_RECORDED = "A change was recorded in {}"
+MSG_CHANGE_RECORDED = "A change was recorded - {}"
 MSG_COMMIT = "commit no.{} - {}"
 
-PROMPT_SSH_PAT_CONFIG = """
-Make sure you have Git installed (version > 1.5)
-2.  Open: Git-Bash
-3.  Run: ssh-keygen -t rsa -b 4096 -C "your_email@example.com"
-4.  Press enter: Enter a file in which to save the key (/c/Users/you/.ssh/id_rsa):[Press enter]
-5.  Press enter: Enter passphrase (empty for no passphrase): [Press enter] (no password needed)
-6.  Press enter: [Press enter again] (no password needed)
-7.  Run: eval $(ssh-agent -s)
-8.  Run: ssh-add ~/.ssh/id_rsa
-9.  Run: clip < ~/.ssh/id_rsa.pub   #Copies the contents of the id_rsa.pub file to your clipboard
-10. Open: github.com
-11. Click: In upper-right corner click profile photo -> settings
-12. Click: SSH and GPG keys (side menu)
-13. Click: New SSH key or Add SSH key.
-14. Title field: write 'auto-git-ssh'
-15. Key field: paste your key
-16. Click: Add SSH key
-17. Click: Developer settings (side menu)
-18. Click: Personal access tokens
-19. Click: Generate new token
-20. Note field: write 'auto-git-pat'
-21. Select scopes: 'repo', 'read:user', 'user:email'
-22. Click: Generate token
-23. COPY!!!: copy the new token (with green V sign aside)
-24. Paste: paste the token here and press enter:
-"""
-PROMPT_PAT = """
-Go to the README file of the project and follow the instructions.
-Please paste your Private Accesses Token here: 
-"""
-PROMPT_REPO_NAME = "Please enter your new repository name: "
+PROMPT_PAT = """Please paste your Private Accesses Token here
+Your PAT: """
+PROMPT_REPO_NAME = """You've never tracked this directory before.
+Please enter a NAME for new remote repository: """
 
 SETTINGS_DIR = Path.home() / 'auto-git-settings'
 SETTINGS_FILE_GLOBAL = SETTINGS_DIR / 'auto_git_settings_global.txt'
-# SETTINGS_PAT = SETTINGS_DIR / 'pat.txt'
-# SETTINGS_USER = SETTINGS_DIR / 'user.txt'
 
 API_BASE_URL = 'https://api.github.com'
 
 
-def initiate_settings_global_dir(settings_dir_path):
+def dir_is_initiated(dir_path):
+    settings_file_local = dir_path / 'auto_git_settings.txt'
 
+    if not settings_file_local.is_file():
+        return False
+    elif settings_file_local.stat().st_size == 0:
+        return False
+    else:
+        return True
+
+
+def cleanup_settings_global():
+    SETTINGS_FILE_GLOBAL.unlink()
+    SETTINGS_DIR.rmdir()
+
+
+def cleanup_settings_local(dir_path):
+    settings_file_local = dir_path / 'auto_git_settings.txt'
+    readme_file = dir_path / 'README.md'
+    gitignore_file = dir_path / '.gitignore'
+    
+    settings_file_local.unlink()
+    readme_file.unlink()
+    gitignore_file.unlink()
+
+
+def initiate_settings_global_dir(settings_dir_path):
     try:
         settings_dir_path.mkdir()
         SETTINGS_FILE_GLOBAL.touch(exist_ok=False)
 
     except FileExistsError:
         print(ERR_PAT_EXISTS)
-        sys.exit()
-
+        raise
 
 def retrieve_pat():
     pat = input(PROMPT_PAT)
@@ -102,13 +97,13 @@ def get_endpoint(end_point, pat):
 
     if not r.ok:
         print(ERR_STATUS_CODE.format(r.status_code))
-        sys.exit()
+        raise ConnectionError
 
     try:
         response_dict = json.loads(r.text)
     except:
         print(ERR_PARSE_JSON)
-        sys.exit()
+        raise
 
     return response_dict
 
@@ -125,13 +120,13 @@ def post_endpoint(end_point, pat, json_data):
     if r.status_code != 201:
         print(ERR_CREATE_REMOTE)
         print(ERR_STATUS_CODE.format(r.status_code))
-        sys.exit()
+        raise ConnectionError
 
     try:
         response_dict = json.loads(r.text)
     except:
         print(ERR_CREATE_REMOTE)
-        sys.exit()
+        raise
 
     return response_dict
 
@@ -164,6 +159,9 @@ async def push_changes(file_to_track):
 
 def start_track(raw_file_path):
     file_to_track = Path(raw_file_path)
+    
+    if not dir_is_initiated(file_to_track.parent):
+        new_track(raw_file_path)
 
     loop = asyncio.get_event_loop()
     try:
@@ -221,11 +219,12 @@ def first_init_add_commit_push(dir_path, settings_dict_local):
 def new_track(raw_file_path):
     file_to_track = Path(raw_file_path)
     dir_path = file_to_track.parent
-    settings_file = dir_path / 'auto_git_settings.txt'
+    settings_file_local = dir_path / 'auto_git_settings.txt'
     readme_file = dir_path / 'README.md'
     gitignore_file = dir_path / '.gitignore'
 
-    initiate_settings_local_dir(settings_file, readme_file, gitignore_file)
+    initiate_settings_local_dir(
+        settings_file_local, readme_file, gitignore_file)
 
     repo_name = input(PROMPT_REPO_NAME)
 
@@ -236,8 +235,12 @@ def new_track(raw_file_path):
 
     settings_dict_global = json.loads(SETTINGS_FILE_GLOBAL.read_text())
 
-    response_dict = post_endpoint(
-        "/user/repos", settings_dict_global['PAT'], json_data)
+    try:
+        response_dict = post_endpoint("/user/repos",
+                                      settings_dict_global['PAT'], json_data)
+    except:
+        cleanup_settings_local(dir_path)
+        sys.exit()
 
     settings_dict_local = {
         "file_name": f"{file_to_track.name}",
@@ -247,15 +250,13 @@ def new_track(raw_file_path):
         "count_commits": 1
     }
 
-    write_settings_local(settings_file, json.dumps(settings_dict_local),
+    write_settings_local(settings_file_local, json.dumps(settings_dict_local),
                          gitignore_file, "auto_git_settings.txt",
                          readme_file, f"# {repo_name}")
 
     first_init_add_commit_push(dir_path, settings_dict_local)
 
     print(MSG_END_NEW_TRACK)
-
-    start_track(raw_file_path)
 
     # * create a dict to json and retrieve https://stackoverflow.com/questions/26745519/converting-dictionary-to-json
     # * create settings file with the repo name and repo ssh https URI
@@ -268,16 +269,26 @@ def new_track(raw_file_path):
 
 
 def first_config():
-
-    initiate_settings_global_dir(SETTINGS_DIR)
+    try:
+        initiate_settings_global_dir(SETTINGS_DIR)
+    except:
+        sys.exit()
 
     pat = retrieve_pat()
 
-    response_dict = get_endpoint("/user", pat)
+    try:
+        response_dict = get_endpoint("/user", pat)
+    except:
+        cleanup_settings_global()
+        sys.exit()
 
     user_name = response_dict['login']
 
-    response_dict = get_endpoint("/user/emails", pat)
+    try:
+        response_dict = get_endpoint("/user/emails", pat)
+    except:
+        cleanup_settings_global()
+        sys.exit()
 
     user_email = response_dict[0]['email']
 
@@ -291,7 +302,7 @@ def first_config():
 
     ret = subprocess.run(f"git config --global user.name {user_name}")
     ret = subprocess.run(f"git config --global user.email {user_email}")
-    #todo - check the ret
+    # todo - check the ret
 
     # todo add github to the list of known-hosts. handle it before pushes!
 
@@ -326,6 +337,7 @@ def main():
 
     # todo add a check for global configuration in the beginning of new-track or start-track
     # todo merge the functions new-track and start-track to one.
+
 
 if __name__ == "__main__":
     main()
