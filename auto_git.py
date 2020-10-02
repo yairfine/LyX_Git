@@ -35,7 +35,8 @@ MSG_END_TRACKING = "Tracking session has ended"
 MSG_CHANGE_RECORDED = "A change was recorded - {}"
 MSG_COMMIT = "commit no.{} - {}"
 
-PROMPT_PAT = """Please paste your Private Accesses Token here
+PROMPT_PAT = """Welcome to auto-git!
+Please paste your Private Accesses Token here
 Your PAT: """
 PROMPT_REPO_NAME = """You've never tracked this directory before.
 Please enter a NAME for new remote repository: """
@@ -44,6 +45,17 @@ SETTINGS_DIR = Path.home() / 'auto-git-settings'
 SETTINGS_FILE_GLOBAL = SETTINGS_DIR / 'auto_git_settings_global.txt'
 
 API_BASE_URL = 'https://api.github.com'
+
+
+def system_is_configured():
+    if not SETTINGS_DIR.is_dir():
+        return False
+    elif not SETTINGS_FILE_GLOBAL.is_file():
+        return False
+    elif SETTINGS_FILE_GLOBAL.stat().st_size == 0:
+        return False
+    else:
+        return True
 
 
 def dir_is_initiated(dir_path):
@@ -72,7 +84,7 @@ def cleanup_settings_local(dir_path):
     gitignore_file.unlink()
 
 
-def initiate_settings_global_dir(settings_dir_path):
+def initiate_settings_global(settings_dir_path):
     try:
         settings_dir_path.mkdir()
         SETTINGS_FILE_GLOBAL.touch(exist_ok=False)
@@ -158,6 +170,9 @@ async def push_changes(file_to_track):
 
 
 def start_track(raw_file_path):
+    if not system_is_configured():
+        first_config()
+
     file_to_track = Path(raw_file_path)
     
     if not dir_is_initiated(file_to_track.parent):
@@ -270,7 +285,7 @@ def new_track(raw_file_path):
 
 def first_config():
     try:
-        initiate_settings_global_dir(SETTINGS_DIR)
+        initiate_settings_global(SETTINGS_DIR)
     except:
         sys.exit()
 
