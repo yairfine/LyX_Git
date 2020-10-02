@@ -10,7 +10,7 @@ Easily keep track your files and control versions with the git version control.
 * Python 3
 * Git (version > 1.5)
 * GitHub account
-    * SSH key configured with your GitHub account
+    * SSH key (__with no passphrase__) configured with your GitHub account 
     * PAT (Private Access Token) - __with scopes: repo, user__ 
 
 For SSH and PAT, follow this tutorials: </br>
@@ -19,13 +19,13 @@ For SSH and PAT, follow this tutorials: </br>
 
 
 ### Configure
-
+Make sure you have all dependencies. </br>
 Clone the repo, using:
 ```
-git clone https://github.com/yairfine/auto-git.git
+git clone git@github.com:yairfine/auto-git.git
 ```
 
-Run the program in first configuration mode:
+Run the program in first-configuration mode:
 ```
 python auto_git.py --first-config
 ```
