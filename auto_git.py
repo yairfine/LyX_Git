@@ -16,7 +16,7 @@ INTERVAL_SECONDS = 7  # 60 in deployment version
 
 DESCRIPTION = "Track file and automatic push to remote github repository."
 EPILOG = "For more information, visit the project page on: https://github.com/yairfine/auto-git"
-HELP_FILE_PATH = "The path to the file you want to git."
+HELP_FILE_PATH = "The path to the file you want to track."
 HELP_FIRST_CONFIG = "Only configure system and exit"
 HELP_NEW_TRACK = "Initiate a new tracking configuration for a given file"
 HELP_START_TRACK = "Start tracking a given file and it's directory"
@@ -331,8 +331,9 @@ def first_config():
 def main():
     parser = ArgumentParser(description=DESCRIPTION, epilog=EPILOG)
 
-    parser.add_argument("file_path", help=HELP_FILE_PATH, metavar=METAVAR_FILE_PATH)
-    parser.add_argument('-f', '--first-config', action="store_true", help=HELP_FIRST_CONFIG)
+    group = parser.add_mutually_exclusive_group(required=True)
+    group.add_argument('-c', '--config', action="store_true", help=HELP_FIRST_CONFIG)
+    group.add_argument('-f', '--file_path', action="store", type=str, help=HELP_FILE_PATH, metavar=METAVAR_FILE_PATH)
 
     # group = parser.add_mutually_exclusive_group(required=True)
     # group.add_argument('-f', '--first-config',
