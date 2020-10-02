@@ -5,9 +5,18 @@ This program automatically track changes of textual files, such as `.lyx`, and p
 Easily keep track your files and control versions with the git version control.
 
 ## Install
+
 ### dependencies
 * Python 3
 * Git (version > 1.5)
+* GitHub account
+    * SSH key configured with your GitHub account
+    * PAT (Private Access Token) - __with scopes: repo, user__ 
+
+For SSH and PAT, follow this tutorials: </br>
+[Connecting to GitHub with SSH](https://docs.github.com/en/free-pro-team@latest/github/authenticating-to-github/connecting-to-github-with-ssh) </br>
+[Creating a personal access token](https://docs.github.com/en/free-pro-team@latest/github/authenticating-to-github/creating-a-personal-access-token)</br>
+
 
 ### Configure
 
