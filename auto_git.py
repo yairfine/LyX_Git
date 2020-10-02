@@ -17,7 +17,7 @@ INTERVAL_SECONDS = 7  # 60 in deployment version
 DESCRIPTION = "Track file and automatic push to remote github repository."
 EPILOG = "For more information, visit the project page on: https://github.com/yairfine/auto-git"
 HELP_FILE_PATH = "The path to the file you want to git."
-HELP_FIRST_CONFIG = "First time: run this to configure your system"
+HELP_FIRST_CONFIG = "Only configure system and exit"
 HELP_NEW_TRACK = "Initiate a new tracking configuration for a given file"
 HELP_START_TRACK = "Start tracking a given file and it's directory"
 METAVAR_FILE_PATH = "<file_path>"
@@ -331,24 +331,32 @@ def first_config():
 def main():
     parser = ArgumentParser(description=DESCRIPTION, epilog=EPILOG)
 
-    group = parser.add_mutually_exclusive_group(required=True)
-    group.add_argument('-f', '--first-config',
-                       action="store_true", help=HELP_FIRST_CONFIG)
-    group.add_argument('-n', '--new-track', action="store",
-                       type=str, help=HELP_NEW_TRACK, metavar=METAVAR_FILE_PATH)
-    group.add_argument('-s', '--start-track', action="store",
-                       type=str, help=HELP_START_TRACK, metavar=METAVAR_FILE_PATH)
+    parser.add_argument("file_path", help=HELP_FILE_PATH, metavar=METAVAR_FILE_PATH)
+    parser.add_argument('-f', '--first-config', action="store_true", help=HELP_FIRST_CONFIG)
+
+    # group = parser.add_mutually_exclusive_group(required=True)
+    # group.add_argument('-f', '--first-config',
+    #                    action="store_true", help=HELP_FIRST_CONFIG)
+    # group.add_argument('-n', '--new-track', action="store",
+    #                    type=str, help=HELP_NEW_TRACK, metavar=METAVAR_FILE_PATH)
+    # group.add_argument('-s', '--start-track', action="store",
+    #                    type=str, help=HELP_START_TRACK, metavar=METAVAR_FILE_PATH)
 
     args = parser.parse_args()
 
-    if args.start_track is not None:
-        start_track(args.start_track)
+    # if args.start_track is not None:
+    #     start_track(args.start_track)
 
-    elif args.new_track is not None:
-        new_track(args.new_track)
+    # elif args.new_track is not None:
+    #     new_track(args.new_track)
 
-    elif args.first_config is not None:
+    # elif args.first_config is not None:
+    #     first_config()
+
+    if args.first_config:
         first_config()
+    else:
+        start_track(args.raw_file_path)
 
     # todo add a check for global configuration in the beginning of new-track or start-track
     # todo merge the functions new-track and start-track to one.
