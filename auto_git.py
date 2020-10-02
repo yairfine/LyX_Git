@@ -354,7 +354,7 @@ def main():
     # elif args.first_config is not None:
     #     first_config()
 
-    if args.first_config:
+    if args.config:
         first_config()
     else:
         start_track(args.raw_file_path)

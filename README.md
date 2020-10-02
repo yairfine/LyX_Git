@@ -25,9 +25,9 @@ Clone the repo, using:
 git clone git@github.com:yairfine/auto-git.git
 ```
 
-Run the program in first-configuration mode:
+Run the program in `--config` mode:
 ```
-python auto_git.py --first-config
+python auto_git.py --config
 ```
 Follow these orders: <br/>
 
