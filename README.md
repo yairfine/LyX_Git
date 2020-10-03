@@ -36,7 +36,7 @@ You are good to go!
 ## Usage
 Start your first tracking session:
 ```
-python auto_git.py <file_to_track_path>
+python auto_git.py --file-path <file_to_track_path>
 ```
 
 ![coding gif](https://media.giphy.com/media/l4FGvUYI0tETAQwGk/giphy.gif)
