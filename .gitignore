@@ -2,3 +2,4 @@
 *.lyx#
 playground.py
 test_api.rest
+__pycache__
