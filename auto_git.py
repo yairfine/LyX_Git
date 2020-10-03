@@ -26,7 +26,7 @@ ERR_PAT_EXISTS = "It's seems like you already configured this system, try to run
 ERR_CREATE_REMOTE = ' ~~ Error creating remote repo ~~ '
 ERR_SETTINGS_LOCAL_EXISTS = "It's seems like you already initiated this directory, try to run again with -s flag"
 ERR_PARSE_JSON = " ~~ Error parsing json ~~ "
-ERR_STATUS_CODE = "Respone code is not ok - {}"
+ERR_STATUS_CODE = "Respone code is not ok - {} - {}"
 
 MSG_END_NEW_TRACK = "Done preparing for a new track"
 MSG_START_TRACKING = "Started tracking changes on file '{}'"
@@ -108,7 +108,7 @@ def get_endpoint(end_point, pat):
     r = requests.get(url, headers=headers)
 
     if not r.ok:
-        print(ERR_STATUS_CODE.format(r.status_code))
+        print(ERR_STATUS_CODE.format(r.status_code, requests.status_codes._codes[r.status_code]))
         raise ConnectionError
 
     try:
@@ -131,7 +131,7 @@ def post_endpoint(end_point, pat, json_data):
 
     if r.status_code != 201:
         print(ERR_CREATE_REMOTE)
-        print(ERR_STATUS_CODE.format(r.status_code))
+        print(ERR_STATUS_CODE.format(r.status_code, requests.status_codes._codes[r.status_code]))
         raise ConnectionError
 
     try:
