@@ -424,7 +424,7 @@ def main():
     if args.config:
         first_config()
     else:
-        start_track(args.raw_file_path)
+        start_track(args.file_path)
 
 
 if __name__ == "__main__":
