@@ -29,8 +29,8 @@ ERR_PARSE_JSON = " ~~ Error parsing json ~~ "
 ERR_STATUS_CODE = "Respone code is not ok - {} - {}"
 
 MSG_END_NEW_TRACK = "Done preparing for a new track"
-MSG_START_TRACKING = "Started tracking changes on file '{}'"
-MSG_EXIT_TRACKING = "To stop: press Ctrl+C and wait a few seconds"
+MSG_START_TRACKING = """Started tracking changes on file '{}'
+To stop: press Ctrl+C and wait a few seconds"""
 MSG_END_TRACKING = "Tracking session has ended"
 MSG_CHANGE_RECORDED = "A change was recorded - {}"
 MSG_COMMIT = "commit no.{} - {}"
@@ -41,14 +41,31 @@ Your PAT: """
 PROMPT_REPO_NAME = """You've never tracked this directory before.
 Please enter a NAME for new remote repository: """
 
-SETTINGS_DIR = Path.home() / 'auto-git-settings'
-SETTINGS_FILE_GLOBAL = SETTINGS_DIR / 'auto_git_settings_global.txt'
+SETTINGS_DIR_GLOBAL = Path.home() / 'auto-git-settings'
+SETTINGS_FILE_GLOBAL = SETTINGS_DIR_GLOBAL / 'auto_git_settings_global.txt'
 
 API_BASE_URL = 'https://api.github.com'
 
 
+def initiate_settings_global():
+    """Create 'auto-git-settings' directory in home dir, and a settings file in it.
+    """
+    try:
+        SETTINGS_DIR_GLOBAL.mkdir()
+        SETTINGS_FILE_GLOBAL.touch(exist_ok=False)
+
+    except FileExistsError:
+        print(ERR_PAT_EXISTS)
+        raise
+
+
 def system_is_configured():
-    if not SETTINGS_DIR.is_dir():
+    """Check if the computer that runs the program is already has the global settings file with PAT, user-name, etc
+
+    Returns:
+        bool: True if the global settings file is already configured in the compter, False otherwise
+    """
+    if not SETTINGS_DIR_GLOBAL.is_dir():
         return False
     elif not SETTINGS_FILE_GLOBAL.is_file():
         return False
@@ -58,7 +75,22 @@ def system_is_configured():
         return True
 
 
+def cleanup_settings_global():
+    """remove the 'auto-git-settings' directory and the global-settings-file in it, from home dir (~/).
+    """
+    SETTINGS_FILE_GLOBAL.unlink()
+    SETTINGS_DIR_GLOBAL.rmdir()
+
+
 def dir_is_initiated(dir_path):
+    """Check if the directory has a settings file, with repo_name, ssh_url, etc.
+
+    Args:
+        dir_path (Pathlib Path): The path to the directory
+
+    Returns:
+        bool: True if the local settings file is already configured in this directory, False otherwise
+    """
     settings_file_local = dir_path / 'auto_git_settings.txt'
 
     if not settings_file_local.is_file():
@@ -69,36 +101,45 @@ def dir_is_initiated(dir_path):
         return True
 
 
-def cleanup_settings_global():
-    SETTINGS_FILE_GLOBAL.unlink()
-    SETTINGS_DIR.rmdir()
-
-
 def cleanup_settings_local(dir_path):
+    """remove the settings-file and the repo files from the given directory.
+
+    Args:
+        dir_path (Pathlib Path): The path to the directory
+    """
     settings_file_local = dir_path / 'auto_git_settings.txt'
     readme_file = dir_path / 'README.md'
     gitignore_file = dir_path / '.gitignore'
-    
+
     settings_file_local.unlink()
     readme_file.unlink()
     gitignore_file.unlink()
 
 
-def initiate_settings_global(settings_dir_path):
-    try:
-        settings_dir_path.mkdir()
-        SETTINGS_FILE_GLOBAL.touch(exist_ok=False)
-
-    except FileExistsError:
-        print(ERR_PAT_EXISTS)
-        raise
-
 def retrieve_pat():
+    """Prompts the user to enter it's Private Access Token to GitHub.
+
+
+    Returns:
+        string: The Private Access Token
+    """
     pat = input(PROMPT_PAT)
     return pat
 
 
 def get_endpoint(end_point, pat):
+    """Preform a GET http request to the end_point of BASE_URL (GitHub API), with the access token pat.
+
+    Args:
+        end_point (string): The end-point in the rest API BASE_URL
+        pat (string): The Private Access Token of the user
+
+    Raises:
+        ConnectionError: Raised when the respones' status code is not ok.
+
+    Returns:
+        python-object: Loaded-json response - Dictionary/array/etc
+    """
     url = f"{API_BASE_URL}{end_point}"
 
     headers = {
@@ -108,48 +149,68 @@ def get_endpoint(end_point, pat):
     r = requests.get(url, headers=headers)
 
     if not r.ok:
-        print(ERR_STATUS_CODE.format(r.status_code, requests.status_codes._codes[r.status_code]))
+        print(ERR_STATUS_CODE.format(r.status_code,
+                                     requests.status_codes._codes[r.status_code]))
         raise ConnectionError
 
     try:
-        response_dict = json.loads(r.text)
+        loaded_json = json.loads(r.text)
     except:
         print(ERR_PARSE_JSON)
         raise
 
-    return response_dict
+    return loaded_json
 
 
-def post_endpoint(end_point, pat, json_data):
+def post_endpoint(end_point, pat, payload):
+    """Preform a POST http request to the end_point of BASE_URL (GitHub API),
+       with the access token pat and the body
+
+    Args:
+        end_point (string): The end-point in the rest API of BASE_URL
+        pat (string): The Private Access Token of the user
+        payload (dictionary): Data to transfer with the POST method
+
+    Raises:
+        ConnectionError: Raised when the respones' status code is not ok.
+
+    Returns:
+        python-object: Loaded-json response - Dictionary/array/etc
+    """
     url = f"{API_BASE_URL}{end_point}"
 
     headers = {
         "Authorization": f"token {pat}"
     }
 
-    r = requests.post(url, headers=headers, json=json_data)
+    r = requests.post(url, headers=headers, json=payload)
 
-    if r.status_code != 201:
+    if not r.ok:
         print(ERR_CREATE_REMOTE)
-        print(ERR_STATUS_CODE.format(r.status_code, requests.status_codes._codes[r.status_code]))
+        print(ERR_STATUS_CODE.format(r.status_code,
+                                     requests.status_codes._codes[r.status_code]))
         raise ConnectionError
 
     try:
-        response_dict = json.loads(r.text)
+        loaded_json = json.loads(r.text)
     except:
         print(ERR_CREATE_REMOTE)
         raise
 
-    return response_dict
+    return loaded_json
 
 
 async def push_changes(file_to_track):
+    """Every INTERVAL, check if any changes took place in the directory, and push them if there where.  
+
+    Args:
+        file_to_track (Pathlib Path): Path to the dominant file we want to track. 
+    """
     dir_path = file_to_track.parent
     settings_file = dir_path / 'auto_git_settings.txt'
     settings_dict = json.loads(settings_file.read_text())
 
     print(MSG_START_TRACKING.format(settings_dict['file_name']))
-    print(MSG_EXIT_TRACKING)
 
     repo = Repo(dir_path)
 
@@ -174,7 +235,7 @@ def start_track(raw_file_path):
         first_config()
 
     file_to_track = Path(raw_file_path)
-    
+
     if not dir_is_initiated(file_to_track.parent):
         new_track(raw_file_path)
 
@@ -243,7 +304,7 @@ def new_track(raw_file_path):
 
     repo_name = input(PROMPT_REPO_NAME)
 
-    json_data = {
+    payload = {
         "name": f"{repo_name}",
         "private": "true"
     }
@@ -252,7 +313,7 @@ def new_track(raw_file_path):
 
     try:
         response_dict = post_endpoint("/user/repos",
-                                      settings_dict_global['PAT'], json_data)
+                                      settings_dict_global['PAT'], payload)
     except:
         cleanup_settings_local(dir_path)
         sys.exit()
@@ -285,7 +346,7 @@ def new_track(raw_file_path):
 
 def first_config():
     try:
-        initiate_settings_global(SETTINGS_DIR)
+        initiate_settings_global()
     except:
         sys.exit()
 
@@ -332,8 +393,10 @@ def main():
     parser = ArgumentParser(description=DESCRIPTION, epilog=EPILOG)
 
     group = parser.add_mutually_exclusive_group(required=True)
-    group.add_argument('-c', '--config', action="store_true", help=HELP_FIRST_CONFIG)
-    group.add_argument('-f', '--file_path', action="store", type=str, help=HELP_FILE_PATH, metavar=METAVAR_FILE_PATH)
+    group.add_argument('-c', '--config', action="store_true",
+                       help=HELP_FIRST_CONFIG)
+    group.add_argument('-f', '--file_path', action="store",
+                       type=str, help=HELP_FILE_PATH, metavar=METAVAR_FILE_PATH)
 
     # group = parser.add_mutually_exclusive_group(required=True)
     # group.add_argument('-f', '--first-config',
