@@ -15,10 +15,10 @@ INTERVAL_SECONDS = 7  # 60 in deployment version
 
 DESCRIPTION = "Track file and automatic push to remote github repository."
 EPILOG = "For more information, visit the project page on: https://github.com/yairfine/auto-git"
-HELP_FILE_PATH = "The path to the file you want to track."
-HELP_FIRST_CONFIG = "Only configure system and exit"
-HELP_NEW_TRACK = "Initiate a new tracking configuration for a given file"
-HELP_START_TRACK = "Start tracking a given file and it's directory"
+HELP_FILE_PATH = "the path to the file you want to track."
+HELP_FIRST_CONFIG = "configure system and exit"
+HELP_NEW_TRACK = "initiate a new tracking configuration for a given file"
+HELP_START_TRACK = "start tracking a given file and it's directory"
 METAVAR_FILE_PATH = "<file_path>"
 
 ERR_PAT_EXISTS = "It's seems like you already configured this system, try to run again with -n/-s flag"
@@ -318,10 +318,13 @@ def first_init_add_commit_push(dir_path, ssh_url):
 
 
 def new_track(raw_file_path):
-    """[summary]
+    """Configure a new file directory to be ready to be tracked.
+       Create settings and GitHub files.
+       Create a remote repository on GitHub
+       Create a local repository and push it to the remote on GitHub.
 
     Args:
-        raw_file_path ([type]): [description]
+        raw_file_path (string): Path to the file to be tracked
     """
     file_to_track = Path(raw_file_path)
     dir_path = file_to_track.parent
@@ -366,6 +369,10 @@ def new_track(raw_file_path):
 
 
 def first_config():
+    """Configure the user's computer to be ready to use the program.
+       Create global settings file with user's PAT, user_name and email.
+       Globally Configure git user's credentials on the machine.
+    """
     try:
         initiate_settings_global()
     except:
@@ -402,6 +409,8 @@ def first_config():
 
 
 def main():
+    """Usage: auto_git.py [-h] (-c | -f <file_path>)
+    """
     parser = ArgumentParser(description=DESCRIPTION, epilog=EPILOG)
 
     group = parser.add_mutually_exclusive_group(required=True)
