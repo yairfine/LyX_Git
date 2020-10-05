@@ -6,7 +6,6 @@ import asyncio
 import requests
 from argparse import ArgumentParser
 from pathlib import Path
-# ? https://www.devdungeon.com/content/working-git-repositories-python
 from git import Repo
 import git
 from pprint import pprint
@@ -80,6 +79,24 @@ def cleanup_settings_global():
     """
     SETTINGS_FILE_GLOBAL.unlink()
     SETTINGS_DIR_GLOBAL.rmdir()
+
+
+def initiate_settings_local_dir(settings_file, readme_file, gitignore_file):
+    """Create settings-file and git repo files in the directory
+
+    Args:
+        settings_file (Pathlib Path): settings-file to create
+        readme_file (Pathlib Path): README.md file to create
+        gitignore_file (Pathlib Path): .gitignore file to create
+    """
+    try:
+        settings_file.touch(exist_ok=False)
+        readme_file.touch(exist_ok=False)
+        gitignore_file.touch(exist_ok=False)
+
+    except FileExistsError:
+        print(ERR_SETTINGS_LOCAL_EXISTS)
+        sys.exit()
 
 
 def dir_is_initiated(dir_path):
@@ -231,6 +248,12 @@ async def push_changes(file_to_track):
 
 
 def start_track(raw_file_path):
+    """The main function that drives the program.
+       Start a tracking session on a given file
+
+    Args:
+        raw_file_path (string): Path to the file to track
+    """
     if not system_is_configured():
         first_config()
 
@@ -250,31 +273,31 @@ def start_track(raw_file_path):
         # maybe update some settings here?
         loop.close()
 
-    # * todo create a time based loop, for checking every minuet if a file was changed
-    # * todo add, commit, and push changes
-    # * todo add count the number of the repos
-    # todo add in json all the files we track
-
-
-def initiate_settings_local_dir(settings_file, readme_file, gitignore_file):
-    try:
-        settings_file.touch(exist_ok=False)
-        readme_file.touch(exist_ok=False)
-        gitignore_file.touch(exist_ok=False)
-
-    except FileExistsError:
-        print(ERR_SETTINGS_LOCAL_EXISTS)
-        sys.exit()
-
 
 def write_settings_local(settings_file, settings_json, readme_file, readme,
                          gitignore_file, ignores):
+    """Write content in settings-file and git repo files
+
+    Args:
+        settings_file (Pathlib Path): settings-file to write in
+        settings_json (string): Content to write in settings-file (json format)
+        readme_file (Pathlib Path): Path to README.md file
+        readme (string): Content to write in README file
+        gitignore_file (Pathlib Path): Path to .gitignore file
+        ignores (string): Content to write in .gitignore file
+    """
     settings_file.write_text(settings_json)
     readme_file.write_text(readme)
     gitignore_file.write_text(ignores)
 
 
 def first_init_add_commit_push(dir_path, settings_dict_local):
+    """[summary]
+
+    Args:
+        dir_path ([type]): [description]
+        settings_dict_local ([type]): [description]
+    """
     new_repo = Repo.init(path=dir_path, mkdir=False)
 
     new_repo.git.add('.')
@@ -334,15 +357,6 @@ def new_track(raw_file_path):
 
     print(MSG_END_NEW_TRACK)
 
-    # * create a dict to json and retrieve https://stackoverflow.com/questions/26745519/converting-dictionary-to-json
-    # * create settings file with the repo name and repo ssh https URI
-    # * todo touch README.md
-    # * todo touch .gitignore file
-    # * todo git init add commit
-    # * todo create new ssh remote tracking branch
-    # todo make sure that github is in known hosts
-    # todo and than start_track()
-
 
 def first_config():
     try:
@@ -378,15 +392,6 @@ def first_config():
 
     ret = subprocess.run(f"git config --global user.name {user_name}")
     ret = subprocess.run(f"git config --global user.email {user_email}")
-    # todo - check the ret
-
-    # todo add github to the list of known-hosts. handle it before pushes!
-
-    # todo generate ssh key, store it on place, and copy the pass to ssh.txt
-
-    # todo give instructions to copy the pat key to pat.txt
-
-    # todo
 
 
 def main():
@@ -398,33 +403,29 @@ def main():
     group.add_argument('-f', '--file_path', action="store",
                        type=str, help=HELP_FILE_PATH, metavar=METAVAR_FILE_PATH)
 
-    # group = parser.add_mutually_exclusive_group(required=True)
-    # group.add_argument('-f', '--first-config',
-    #                    action="store_true", help=HELP_FIRST_CONFIG)
-    # group.add_argument('-n', '--new-track', action="store",
-    #                    type=str, help=HELP_NEW_TRACK, metavar=METAVAR_FILE_PATH)
-    # group.add_argument('-s', '--start-track', action="store",
-    #                    type=str, help=HELP_START_TRACK, metavar=METAVAR_FILE_PATH)
-
     args = parser.parse_args()
-
-    # if args.start_track is not None:
-    #     start_track(args.start_track)
-
-    # elif args.new_track is not None:
-    #     new_track(args.new_track)
-
-    # elif args.first_config is not None:
-    #     first_config()
 
     if args.config:
         first_config()
     else:
         start_track(args.raw_file_path)
 
-    # todo add a check for global configuration in the beginning of new-track or start-track
-    # todo merge the functions new-track and start-track to one.
-
 
 if __name__ == "__main__":
     main()
+
+# todo - check the ret
+# todo add github to the list of known-hosts. handle it before pushes!
+# todo generate ssh key, store it on place, and copy the pass to ssh.txt
+# todo give instructions to copy the pat key to pat.txt
+# todo add in json all the files we track
+# todo add a check for global configuration in the beginning of new-track or start-track
+# todo merge the functions new-track and start-track to one.
+# todo make sure that github is in known hosts
+
+"""
+Useful links:
+tutorial GitPython https://www.devdungeon.com/content/working-git-repositories-python
+create a dict to json and retrieve https://stackoverflow.com/questions/26745519/converting-dictionary-to-json
+
+"""
