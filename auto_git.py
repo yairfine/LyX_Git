@@ -291,12 +291,15 @@ def write_settings_local(settings_file, settings_json, readme_file, readme,
     gitignore_file.write_text(ignores)
 
 
-def first_init_add_commit_push(dir_path, settings_dict_local):
-    """[summary]
+def first_init_add_commit_push(dir_path, ssh_url):
+    """Initialize a new local git repository in the directory.
+       Add all file to it and commit them.
+       Create a new remote-tracking-branch 'master'.
+       Push the repo to the fresh already created GitHub repository.
 
     Args:
-        dir_path ([type]): [description]
-        settings_dict_local ([type]): [description]
+        dir_path (Pathlib Path): Path to the directory
+        ssh_url (string): Remote repository ssh-url
     """
     new_repo = Repo.init(path=dir_path, mkdir=False)
 
@@ -306,8 +309,7 @@ def first_init_add_commit_push(dir_path, settings_dict_local):
     new_repo.create_head('master').checkout()
 
     try:
-        origin = new_repo.create_remote(
-            'origin', url=settings_dict_local['ssh_url'])
+        origin = new_repo.create_remote('origin', url=ssh_url)
     except:
         print(ERR_CREATE_REMOTE)
         sys.exit()
@@ -316,6 +318,11 @@ def first_init_add_commit_push(dir_path, settings_dict_local):
 
 
 def new_track(raw_file_path):
+    """[summary]
+
+    Args:
+        raw_file_path ([type]): [description]
+    """
     file_to_track = Path(raw_file_path)
     dir_path = file_to_track.parent
     settings_file_local = dir_path / 'auto_git_settings.txt'
@@ -353,7 +360,7 @@ def new_track(raw_file_path):
                          gitignore_file, "auto_git_settings.txt",
                          readme_file, f"# {repo_name}")
 
-    first_init_add_commit_push(dir_path, settings_dict_local)
+    first_init_add_commit_push(dir_path, settings_dict_local['ssh_url'])
 
     print(MSG_END_NEW_TRACK)
 
