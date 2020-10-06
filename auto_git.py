@@ -405,7 +405,18 @@ def first_config():
     SETTINGS_FILE_GLOBAL.write_text(settings_json_global)
 
     ret = subprocess.run(f"git config --global user.name {user_name}")
+    try:
+        ret.check_returncode()
+    except subprocess.CalledProcessError:
+        print(ret.stderr)
+        raise
+
     ret = subprocess.run(f"git config --global user.email {user_email}")
+    try:
+        ret.check_returncode()
+    except subprocess.CalledProcessError:
+        print(ret.stderr)
+        raise
 
 
 def main():
@@ -430,14 +441,15 @@ def main():
 if __name__ == "__main__":
     main()
 
-# todo - check the ret
+# * todo check the ret
 # todo add github to the list of known-hosts. handle it before pushes!
-# todo generate ssh key, store it on place, and copy the pass to ssh.txt
-# todo give instructions to copy the pat key to pat.txt
+# ! todo generate ssh key, store it on place, and copy the pass to ssh.txt
 # todo add in json all the files we track
-# todo add a check for global configuration in the beginning of new-track or start-track
+# * todo add a check for global configuration in the beginning of new-track or start-track
 # todo merge the functions new-track and start-track to one.
 # todo make sure that github is in known hosts
+# ? settings file hidden
+# ? retrieve PAT like the web app flow
 
 """
 Useful links:
