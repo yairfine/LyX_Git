@@ -132,6 +132,24 @@ def cleanup_settings_local(dir_path):
     readme_file.unlink()
     gitignore_file.unlink()
 
+    
+def lock(path):
+    ret = subprocess.run(f"attrib +R +H {path}")
+    try:
+        ret.check_returncode()
+    except subprocess.CalledProcessError:
+        print(ret.stderr)
+        raise
+
+
+def unlock(path):
+    ret = subprocess.run(f"attrib -R +H {path}")
+    try:
+        ret.check_returncode()
+    except subprocess.CalledProcessError:
+        print(ret.stderr)
+        raise
+
 
 def retrieve_pat():
     """Prompts the user to enter it's Private Access Token to GitHub.
@@ -243,7 +261,10 @@ async def push_changes(file_to_track):
 
             settings_dict['count_commits'] += 1
             settings_json = json.dumps(settings_dict)
+            unlock(settings_file)
             settings_file.write_text(settings_json)
+            lock(settings_file)
+
             print(MSG_CHANGE_RECORDED.format(time.asctime(time.localtime())))
 
 
@@ -269,9 +290,10 @@ def start_track(raw_file_path):
     except KeyboardInterrupt:
         pass
     finally:
-        print(MSG_END_TRACKING)
         # maybe update some settings here?
         loop.close()
+        print(MSG_END_TRACKING)
+
 
 
 def write_settings_local(settings_file, settings_json, readme_file, readme,
@@ -362,10 +384,27 @@ def new_track(raw_file_path):
     write_settings_local(settings_file_local, json.dumps(settings_dict_local),
                          gitignore_file, "auto_git_settings.txt",
                          readme_file, f"# {repo_name}")
+    lock(settings_file_local)
 
     first_init_add_commit_push(dir_path, settings_dict_local['ssh_url'])
 
     print(MSG_END_NEW_TRACK)
+
+
+def git_config_global(user_name, user_email):
+    ret = subprocess.run(f"git config --global user.name {user_name}")
+    try:
+        ret.check_returncode()
+    except subprocess.CalledProcessError:
+        print(ret.stderr)
+        raise
+
+    ret = subprocess.run(f"git config --global user.email {user_email}")
+    try:
+        ret.check_returncode()
+    except subprocess.CalledProcessError:
+        print(ret.stderr)
+        raise
 
 
 def first_config():
@@ -403,20 +442,9 @@ def first_config():
     }
     settings_json_global = json.dumps(settings_dict_global)
     SETTINGS_FILE_GLOBAL.write_text(settings_json_global)
+    lock(SETTINGS_DIR_GLOBAL)
 
-    ret = subprocess.run(f"git config --global user.name {user_name}")
-    try:
-        ret.check_returncode()
-    except subprocess.CalledProcessError:
-        print(ret.stderr)
-        raise
-
-    ret = subprocess.run(f"git config --global user.email {user_email}")
-    try:
-        ret.check_returncode()
-    except subprocess.CalledProcessError:
-        print(ret.stderr)
-        raise
+    git_config_global(user_name, user_email)
 
 
 def main():
@@ -446,14 +474,15 @@ if __name__ == "__main__":
 # ! todo generate ssh key, store it on place, and copy the pass to ssh.txt
 # todo add in json all the files we track
 # * todo add a check for global configuration in the beginning of new-track or start-track
-# todo merge the functions new-track and start-track to one.
+# * todo merge the functions new-track and start-track to one.
 # todo make sure that github is in known hosts
 # ? settings file hidden
 # ? retrieve PAT like the web app flow
 
 """
 Useful links:
-tutorial GitPython https://www.devdungeon.com/content/working-git-repositories-python
+GitPython tutorial https://www.devdungeon.com/content/working-git-repositories-python
 create a dict to json and retrieve https://stackoverflow.com/questions/26745519/converting-dictionary-to-json
+subprocess https://docs.python.org/3/library/subprocess.html#subprocess.run
 
 """
