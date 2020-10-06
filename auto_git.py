@@ -143,7 +143,7 @@ def lock(path):
 
 
 def unlock(path):
-    ret = subprocess.run(f"attrib -R +H {path}")
+    ret = subprocess.run(f"attrib -R -H {path}")
     try:
         ret.check_returncode()
     except subprocess.CalledProcessError:
