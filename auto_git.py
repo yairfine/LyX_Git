@@ -1,3 +1,4 @@
+# CR: You're not using "os" module.
 import os
 import sys
 import json
@@ -7,6 +8,7 @@ import requests
 from argparse import ArgumentParser
 from pathlib import Path
 from git import Repo
+# CR: You're not using "git" and "pprint".
 import git
 from pprint import pprint
 import subprocess
@@ -17,7 +19,9 @@ DESCRIPTION = "Track file and automatic push to remote github repository."
 EPILOG = "For more information, visit the project page on: https://github.com/yairfine/auto-git"
 HELP_FILE_PATH = "the path to the file you want to track."
 HELP_FIRST_CONFIG = "configure system and exit"
+# CR: You dont use this
 HELP_NEW_TRACK = "initiate a new tracking configuration for a given file"
+# and this too
 HELP_START_TRACK = "start tracking a given file and it's directory"
 METAVAR_FILE_PATH = "<file_path>"
 
@@ -47,6 +51,7 @@ API_BASE_URL = 'https://api.github.com'
 
 
 def initiate_settings_global():
+    # CR: Add a new line between the """ to the start of the docstring.
     """Create 'auto-git-settings' directory in home dir, and a settings file in it.
     """
     try:
@@ -54,6 +59,7 @@ def initiate_settings_global():
         SETTINGS_FILE_GLOBAL.touch(exist_ok=False)
 
     except FileExistsError:
+        # CR: use "logging" module to print you log messages, specially "logging.exception".
         print(ERR_PAT_EXISTS)
         raise
 
@@ -95,6 +101,7 @@ def initiate_settings_local_dir(settings_file, readme_file, gitignore_file):
         gitignore_file.touch(exist_ok=False)
 
     except FileExistsError:
+        # CR: again you don't need sys.exit
         print(ERR_SETTINGS_LOCAL_EXISTS)
         sys.exit()
 
@@ -184,8 +191,10 @@ def get_endpoint(end_point, pat):
     r = requests.get(url, headers=headers)
 
     if not r.ok:
+        # CR: use logging.
         print(ERR_STATUS_CODE.format(r.status_code,
                                      requests.status_codes._codes[r.status_code]))
+        # CR: Raise an instance of "ConnectionError".
         raise ConnectionError
 
     try:
@@ -283,6 +292,7 @@ def start_track(raw_file_path):
     if not dir_is_initiated(file_to_track.parent):
         new_track(raw_file_path)
 
+    # CR: The asyncio is a bit overkill, "threading.Timer" is less complicated.
     loop = asyncio.get_event_loop()
     try:
         asyncio.ensure_future(push_changes(file_to_track))
@@ -338,7 +348,7 @@ def first_init_add_commit_push(dir_path, ssh_url):
 
     new_repo.git.push("--set-upstream", origin, new_repo.head.ref)
 
-
+# CR: Too long function
 def new_track(raw_file_path):
     """Configure a new file directory to be ready to be tracked.
        Create settings and GitHub files.
@@ -392,6 +402,8 @@ def new_track(raw_file_path):
 
 
 def git_config_global(user_name, user_email):
+    # CR: Are you sure you want to override the global setting of the user?
+    # What if the user have already customised settings?
     ret = subprocess.run(f"git config --global user.name {user_name}")
     try:
         ret.check_returncode()
@@ -415,6 +427,9 @@ def first_config():
     try:
         initiate_settings_global()
     except:
+        # CR: it's useless to catch the inner exception just to exit the program.
+        # it could be more reasonable if you need to do some cleanup but you don't.
+        # Delete it here and in all the other places.
         sys.exit()
 
     pat = retrieve_pat()
@@ -441,6 +456,7 @@ def first_config():
         "user_email": f"{user_email}"
     }
     settings_json_global = json.dumps(settings_dict_global)
+    # CR: nice...
     SETTINGS_FILE_GLOBAL.write_text(settings_json_global)
     lock(SETTINGS_DIR_GLOBAL)
 
