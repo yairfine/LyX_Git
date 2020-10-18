@@ -7,6 +7,7 @@ Easily keep track your files and control versions with the git version control.
 ## Install
 
 ### Dependencies
+* Windows OS
 * Python 3
 * Git (version > 1.5)
 * GitHub account
