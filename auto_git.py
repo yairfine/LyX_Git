@@ -11,7 +11,7 @@ import git
 from pprint import pprint
 import subprocess
 
-INTERVAL_SECONDS = 7  # 60 in deployment version
+INTERVAL_SECONDS = 30  # 60 in deployment version
 
 DESCRIPTION = "Track file and automatic push to remote github repository."
 EPILOG = "For more information, visit the project page on: https://github.com/yairfine/auto-git"
@@ -382,9 +382,12 @@ def new_track(raw_file_path):
         "count_commits": 1
     }
 
+    ignores = "auto-git-settings.txt" # fix this!
+    readme = f"# {repo_name}"
+
     write_settings_local(settings_file_local, json.dumps(settings_dict_local),
-                         gitignore_file, "auto_git_settings.txt",
-                         readme_file, f"# {repo_name}")
+                         gitignore_file, ignores,
+                         readme_file, readme)
     lock(settings_file_local)
 
     first_init_add_commit_push(dir_path, settings_dict_local['ssh_url'])
@@ -484,6 +487,7 @@ if __name__ == "__main__":
 # todo add a success message after first config !
 # todo all prints -> loggings
 # todo add debug mode the prints loggings to file.
+# todo solve to local settings NOT ignore
 
 """
 Useful links:
