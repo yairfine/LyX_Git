@@ -8,7 +8,9 @@ Easily keep track your files and control versions with the git version control.
 
 ### Dependencies
 * Windows OS
-* Python 3
+* Python 3, installed packages:
+    * gitpython
+    * requests
 * Git (version > 1.5)
 * GitHub account
     * SSH key (__with no passphrase__) configured with your GitHub account 
