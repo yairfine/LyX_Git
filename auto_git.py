@@ -255,16 +255,17 @@ async def push_changes(file_to_track):
 
         if repo.is_dirty(untracked_files=True):
 
-            repo.git.add('.')
-            repo.index.commit(MSG_COMMIT.format(settings_dict['count_commits'],
-                                                time.asctime(time.localtime())))
-            repo.remotes.origin.push()
-
             settings_dict['count_commits'] += 1
             settings_json = json.dumps(settings_dict)
             unlock(settings_file)
             settings_file.write_text(settings_json)
             lock(settings_file)
+
+            repo.git.add('.')
+            repo.index.commit(MSG_COMMIT.format(settings_dict['count_commits'],
+                                                time.asctime(time.localtime())))
+            repo.remotes.origin.push()
+
 
             print(MSG_CHANGE_RECORDED.format(time.asctime(time.localtime())))
 
@@ -382,7 +383,7 @@ def new_track(raw_file_path):
         "count_commits": 1
     }
 
-    ignores = "auto-git-settings.txt" # fix this!
+    ignores = "" # fix this!
     readme = f"# {repo_name}"
 
     write_settings_local(settings_file_local, json.dumps(settings_dict_local),
