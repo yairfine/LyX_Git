@@ -33,6 +33,7 @@ To stop: press Ctrl+C and wait a few seconds"""
 MSG_END_TRACKING = "Tracking session has ended"
 MSG_CHANGE_RECORDED = "A change was recorded - {}"
 MSG_COMMIT = "commit no.{} - {}"
+MSG_SUCCESS_CONFIG = "Config was successful !"
 
 PROMPT_PAT = """Welcome to auto-git!
 Please paste your Private Accesses Token here
@@ -446,6 +447,8 @@ def first_config():
 
     git_config_global(user_name, user_email)
 
+    print(MSG_SUCCESS_CONFIG)
+
 
 def main():
     """Usage: auto_git.py [-h] (-c | -f <file_path>)
@@ -478,6 +481,9 @@ if __name__ == "__main__":
 # todo make sure that github is in known hosts
 # ? settings file hidden
 # ? retrieve PAT like the web app flow
+# todo add a success message after first config !
+# todo all prints -> loggings
+# todo add debug mode the prints loggings to file.
 
 """
 Useful links:
