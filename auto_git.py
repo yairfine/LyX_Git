@@ -11,7 +11,7 @@ import git
 from pprint import pprint
 import subprocess
 
-INTERVAL_SECONDS = 30  # 60 in deployment version
+INTERVAL_SECONDS = 60  # 60 in deployment version
 
 DESCRIPTION = "Track file and automatic push to remote github repository."
 EPILOG = "For more information, visit the project page on: https://github.com/yairfine/auto-git"
