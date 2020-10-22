@@ -489,6 +489,7 @@ if __name__ == "__main__":
 # todo all prints -> loggings
 # todo add debug mode the prints loggings to file.
 # todo solve to local settings NOT ignore
+# todo handle pathes with spaces!
 
 """
 Useful links:
