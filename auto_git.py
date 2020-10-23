@@ -15,11 +15,11 @@ INTERVAL_SECONDS = 60  # 60 in deployment version
 
 DESCRIPTION = "Track file and automatic push to remote github repository."
 EPILOG = "For more information, visit the project page on: https://github.com/yairfine/auto-git"
-HELP_FILE_PATH = "the path to the file you want to track."
+HELP_FILE_PATH = "the path to the file you want to track"
 HELP_FIRST_CONFIG = "configure system and exit"
 HELP_NEW_TRACK = "initiate a new tracking configuration for a given file"
 HELP_START_TRACK = "start tracking a given file and it's directory"
-METAVAR_FILE_PATH = "<file_path>"
+METAVAR_FILE_PATH = '"<file_path>"'
 
 ERR_PAT_EXISTS = "It's seems like you already configured this system, try to run again with -n/-s flag"
 ERR_CREATE_REMOTE = ' ~~ Error creating remote repo ~~ '
