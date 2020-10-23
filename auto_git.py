@@ -29,7 +29,7 @@ ERR_STATUS_CODE = "Respone code is not ok - {} - {}"
 
 MSG_END_NEW_TRACK = "Done preparing for a new track"
 MSG_START_TRACKING = """Started tracking changes on file '{}'
-To stop: press Ctrl+C and wait a few seconds"""
+To stop: press Ctrl+C and wait a minute"""
 MSG_END_TRACKING = "Tracking session has ended"
 MSG_CHANGE_RECORDED = "A change was recorded - {}"
 MSG_COMMIT = "commit no.{} - {}"
@@ -140,7 +140,7 @@ def lock(path):
     Args:
         path (Pathlib Path): Path to the file to lock
     """
-    ret = subprocess.run(f"attrib +R +H {path}")
+    ret = subprocess.run(f'attrib +R +H "{path}"')
     try:
         ret.check_returncode()
     except subprocess.CalledProcessError:
@@ -154,7 +154,7 @@ def unlock(path):
     Args:
         path (Pathlib Path): Path to the file to un-lock
     """
-    ret = subprocess.run(f"attrib -R -H {path}")
+    ret = subprocess.run(f'attrib -R -H "{path}"')
     try:
         ret.check_returncode()
     except subprocess.CalledProcessError:
