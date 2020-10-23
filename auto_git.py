@@ -135,6 +135,11 @@ def cleanup_settings_local(dir_path):
 
     
 def lock(path):
+    """Hide and read-only a given file
+
+    Args:
+        path (Pathlib Path): Path to the file to lock
+    """
     ret = subprocess.run(f"attrib +R +H {path}")
     try:
         ret.check_returncode()
@@ -144,6 +149,11 @@ def lock(path):
 
 
 def unlock(path):
+    """Un-hide and un-read-only a given file
+
+    Args:
+        path (Pathlib Path): Path to the file to un-lock
+    """
     ret = subprocess.run(f"attrib -R -H {path}")
     try:
         ret.check_returncode()
