@@ -133,7 +133,7 @@ def cleanup_settings_local(dir_path):
     readme_file.unlink()
     gitignore_file.unlink()
 
-    
+
 def lock(path):
     """Hide and read-only a given file
 
@@ -276,7 +276,6 @@ async def push_changes(file_to_track):
                                                 time.asctime(time.localtime())))
             repo.remotes.origin.push()
 
-
             print(MSG_CHANGE_RECORDED.format(time.asctime(time.localtime())))
 
 
@@ -305,7 +304,6 @@ def start_track(raw_file_path):
         # maybe update some settings here?
         loop.close()
         print(MSG_END_TRACKING)
-
 
 
 def write_settings_local(settings_file, settings_json, readme_file, readme,
@@ -393,7 +391,7 @@ def new_track(raw_file_path):
         "count_commits": 1
     }
 
-    ignores = "" # fix this!
+    ignores = ""  # fix this!
     readme = f"# {repo_name}"
 
     write_settings_local(settings_file_local, json.dumps(settings_dict_local),
