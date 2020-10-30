@@ -93,9 +93,9 @@ def initiate_settings_local_dir(settings_file, readme_file, gitignore_file):
         gitignore_file (Pathlib Path): .gitignore file to create
     """
     try:
-        settings_file.touch(exist_ok=False)
-        readme_file.touch(exist_ok=False)
-        gitignore_file.touch(exist_ok=False)
+        settings_file.touch(exist_ok=True)
+        readme_file.touch(exist_ok=True)
+        gitignore_file.touch(exist_ok=True)
 
     except FileExistsError:
         print(ERR_SETTINGS_LOCAL_EXISTS)
