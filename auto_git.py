@@ -21,9 +21,11 @@ HELP_NEW_TRACK = "initiate a new tracking configuration for a given file"
 HELP_START_TRACK = "start tracking a given file and it's directory"
 METAVAR_FILE_PATH = '"<file_path>"'
 
-ERR_PAT_EXISTS = "It's seems like you already configured this system, try to run again with -n/-s flag"
+ERR_SETTINGS_GLOBAL_EXISTS = """It's seems like you already configured this system,
+try to run again with -f flag"""
 ERR_CREATE_REMOTE = ' ~~ Error creating remote repo ~~ '
-ERR_SETTINGS_LOCAL_EXISTS = "It's seems like you already initiated this directory, try to run again with -s flag"
+ERR_SETTINGS_LOCAL_EXISTS = """It's seems like you already initiated this directory, please check your
+auto-git-settings file to see if it's not empty."""
 ERR_PARSE_JSON = " ~~ Error parsing json ~~ "
 ERR_STATUS_CODE = "Respone code is not ok - {} - {}"
 
@@ -55,7 +57,7 @@ def initiate_settings_global():
         SETTINGS_FILE_GLOBAL.touch(exist_ok=False)
 
     except FileExistsError:
-        print(ERR_PAT_EXISTS)
+        print(ERR_SETTINGS_GLOBAL_EXISTS)
         raise
 
 
