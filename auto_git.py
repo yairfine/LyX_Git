@@ -475,7 +475,12 @@ def main():
     group.add_argument('-f', '--file_path', action="store",
                        type=str, help=HELP_FILE_PATH, metavar=METAVAR_FILE_PATH)
 
+    parser.add_argument('-d', '--debug', action="store_true")
+
     args = parser.parse_args()
+
+    if args.debug:
+        INTERVAL_SECONDS = 10
 
     if args.config:
         first_config()
