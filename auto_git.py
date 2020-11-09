@@ -11,7 +11,7 @@ import git
 from pprint import pprint
 import subprocess
 
-INTERVAL_SECONDS = 60  # 60 in deployment version
+INTERVAL_SECONDS = 40
 
 DESCRIPTION = "Track file and automatic push to remote github repository."
 EPILOG = "For more information, visit the project page on: https://github.com/yairfine/auto-git"
@@ -21,9 +21,11 @@ HELP_NEW_TRACK = "initiate a new tracking configuration for a given file"
 HELP_START_TRACK = "start tracking a given file and it's directory"
 METAVAR_FILE_PATH = '"<file_path>"'
 
-ERR_PAT_EXISTS = "It's seems like you already configured this system, try to run again with -n/-s flag"
+ERR_SETTINGS_GLOBAL_EXISTS = """It's seems like you already configured this system,
+try to run again with -f flag"""
 ERR_CREATE_REMOTE = ' ~~ Error creating remote repo ~~ '
-ERR_SETTINGS_LOCAL_EXISTS = "It's seems like you already initiated this directory, try to run again with -s flag"
+ERR_SETTINGS_LOCAL_EXISTS = """It's seems like you already initiated this directory, please check your
+auto-git-settings file to see if it's not empty."""
 ERR_PARSE_JSON = " ~~ Error parsing json ~~ "
 ERR_STATUS_CODE = "Respone code is not ok - {} - {}"
 
@@ -55,7 +57,7 @@ def initiate_settings_global():
         SETTINGS_FILE_GLOBAL.touch(exist_ok=False)
 
     except FileExistsError:
-        print(ERR_PAT_EXISTS)
+        print(ERR_SETTINGS_GLOBAL_EXISTS)
         raise
 
 
@@ -91,9 +93,9 @@ def initiate_settings_local_dir(settings_file, readme_file, gitignore_file):
         gitignore_file (Pathlib Path): .gitignore file to create
     """
     try:
-        settings_file.touch(exist_ok=False)
-        readme_file.touch(exist_ok=False)
-        gitignore_file.touch(exist_ok=False)
+        settings_file.touch(exist_ok=True)
+        readme_file.touch(exist_ok=True)
+        gitignore_file.touch(exist_ok=True)
 
     except FileExistsError:
         print(ERR_SETTINGS_LOCAL_EXISTS)
@@ -133,7 +135,7 @@ def cleanup_settings_local(dir_path):
     readme_file.unlink()
     gitignore_file.unlink()
 
-    
+
 def lock(path):
     """Hide and read-only a given file
 
@@ -276,7 +278,6 @@ async def push_changes(file_to_track):
                                                 time.asctime(time.localtime())))
             repo.remotes.origin.push()
 
-
             print(MSG_CHANGE_RECORDED.format(time.asctime(time.localtime())))
 
 
@@ -305,7 +306,6 @@ def start_track(raw_file_path):
         # maybe update some settings here?
         loop.close()
         print(MSG_END_TRACKING)
-
 
 
 def write_settings_local(settings_file, settings_json, readme_file, readme,
@@ -393,7 +393,7 @@ def new_track(raw_file_path):
         "count_commits": 1
     }
 
-    ignores = "" # fix this!
+    ignores = ""  # fix this!
     readme = f"# {repo_name}"
 
     write_settings_local(settings_file_local, json.dumps(settings_dict_local),
