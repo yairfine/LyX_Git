@@ -399,7 +399,10 @@ def new_track(raw_file_path):
     write_settings_local(settings_file_local, json.dumps(settings_dict_local),
                          gitignore_file, ignores,
                          readme_file, readme)
+
     lock(settings_file_local)
+    lock(readme_file)
+    lock(gitignore_file)
 
     first_init_add_commit_push(dir_path, settings_dict_local['ssh_url'])
 
@@ -480,6 +483,7 @@ def main():
     args = parser.parse_args()
 
     if args.debug:
+        global INTERVAL_SECONDS
         INTERVAL_SECONDS = 10
 
     if args.config:
