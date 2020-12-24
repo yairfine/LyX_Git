@@ -1,52 +1,14 @@
-import os
 import sys
 import json
 import time
 import asyncio
 import requests
-from argparse import ArgumentParser
 from pathlib import Path
 from git import Repo
 import git
 from pprint import pprint
 import subprocess
-
-INTERVAL_SECONDS = 40
-
-DESCRIPTION = "Track file and automatic push to remote github repository."
-EPILOG = "For more information, visit the project page on: https://github.com/yairfine/auto-git"
-HELP_FILE_PATH = "the path to the file you want to track"
-HELP_FIRST_CONFIG = "configure system and exit"
-HELP_NEW_TRACK = "initiate a new tracking configuration for a given file"
-HELP_START_TRACK = "start tracking a given file and it's directory"
-METAVAR_FILE_PATH = '"<file_path>"'
-
-ERR_SETTINGS_GLOBAL_EXISTS = """It's seems like you already configured this system,
-try to run again with -f flag"""
-ERR_CREATE_REMOTE = ' ~~ Error creating remote repo ~~ '
-ERR_SETTINGS_LOCAL_EXISTS = """It's seems like you already initiated this directory, please check your
-auto-git-settings file to see if it's not empty."""
-ERR_PARSE_JSON = " ~~ Error parsing json ~~ "
-ERR_STATUS_CODE = "Respone code is not ok - {} - {}"
-
-MSG_END_NEW_TRACK = "Done preparing for a new track"
-MSG_START_TRACKING = """Started tracking changes on file '{}'
-To stop: press Ctrl+C and wait a minute"""
-MSG_END_TRACKING = "Tracking session has ended"
-MSG_CHANGE_RECORDED = "A change was recorded - {}"
-MSG_COMMIT = "commit no.{} - {}"
-MSG_SUCCESS_CONFIG = "Config was successful !"
-
-PROMPT_PAT = """Welcome to auto-git!
-Please paste your Private Accesses Token here
-Your PAT: """
-PROMPT_REPO_NAME = """You've never tracked this directory before.
-Please enter a NAME for new remote repository: """
-
-SETTINGS_DIR_GLOBAL = Path.home() / 'auto-git-settings'
-SETTINGS_FILE_GLOBAL = SETTINGS_DIR_GLOBAL / 'auto_git_settings_global.txt'
-
-API_BASE_URL = 'https://api.github.com'
+from constants import *
 
 
 def initiate_settings_global():
@@ -466,34 +428,6 @@ def first_config():
 
     print(MSG_SUCCESS_CONFIG)
 
-
-def main():
-    """Usage: auto_git.py [-h] (-c | -f <file_path>)
-    """
-    parser = ArgumentParser(description=DESCRIPTION, epilog=EPILOG)
-
-    group = parser.add_mutually_exclusive_group(required=True)
-    group.add_argument('-c', '--config', action="store_true",
-                       help=HELP_FIRST_CONFIG)
-    group.add_argument('-f', '--file_path', action="store",
-                       type=str, help=HELP_FILE_PATH, metavar=METAVAR_FILE_PATH)
-
-    parser.add_argument('-d', '--debug', action="store_true")
-
-    args = parser.parse_args()
-
-    if args.debug:
-        global INTERVAL_SECONDS
-        INTERVAL_SECONDS = 10
-
-    if args.config:
-        first_config()
-    else:
-        start_track(args.file_path)
-
-
-if __name__ == "__main__":
-    main()
 
 # * todo check the ret
 # todo add github to the list of known-hosts. handle it before pushes!
