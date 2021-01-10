@@ -1,6 +1,6 @@
 from pathlib import Path
 
-INTERVAL_SECONDS = 1000
+INTERVAL_SECONDS = 2000
 
 DESCRIPTION = "Track file and automatic push to remote github repository."
 EPILOG = "For more information, visit the project page on: https://github.com/yairfine/auto-git"
